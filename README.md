@@ -8,10 +8,11 @@ O WebLib permite organizar o acervo de uma biblioteca e gerenciar operações re
 
 O projeto está em desenvolvimento e faz parte da minha jornada de aprendizado em Análise e Desenvolvimento de Sistemas.
 
-## Demonstração do projeto
+## Demonstração
 
-Gravei um tour pelo WebLib para apresentar a interface,
-a navegação e as principais funcionalidades do sistema.
+Confira o vídeo para conhecer a interface do WebLib,
+navegar pelo catálogo e visualizar as principais funcionalidades
+implementadas no sistema.
 
 ▶️ [Assistir à demonstração do WebLib](https://youtu.be/ud_VIjblMJQ)
 
