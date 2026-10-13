@@ -1,0 +1,98 @@
+﻿@model IEnumerable<Biblioteca.Models.Newsletter>
+
+@{
+    ViewData["Title"] = "Newsletter";
+}
+
+<div class="container py-4">
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="mb-1">
+                Newsletter
+            </h2>
+
+            <p class="text-muted mb-0">
+                Pessoas cadastradas para receber novidades da biblioteca.
+            </p>
+        </div>
+
+        <span class="badge text-bg-secondary fs-6">
+            @Model.Count() inscritos
+        </span>
+    </div>
+
+    <div class="card shadow-sm border-0">
+        <div class="card-body p-0">
+
+            @if (!Model.Any())
+            {
+                <div class="text-center py-5">
+                    <i class="bi bi-envelope-x fs-1 text-muted"></i>
+
+                    <h5 class="mt-3">
+                        Nenhum inscrito ainda
+                    </h5>
+
+                    <p class="text-muted mb-0">
+                        Quando alguém se cadastrar na newsletter, aparecerá aqui.
+                    </p>
+                </div>
+            }
+            else
+            {
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+
+                        <thead>
+                            <tr>
+                                <th class="ps-4">E-mail</th>
+                                <th>Data de inscrição</th>
+                                <th class="text-end pe-4">Ações</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            @foreach (var inscrito in Model)
+                            {
+                                <tr>
+                                    <td class="ps-4">
+                                        <i class="bi bi-envelope me-2 text-muted"></i>
+                                        @inscrito.Email
+                                    </td>
+
+                                    <td>
+                                        @inscrito.DataInscricao.ToString("dd/MM/yyyy HH:mm")
+                                    </td>
+
+                                    <td class="text-end pe-4">
+                                        <form asp-action="Delete"
+                                              method="post"
+                                              class="d-inline"
+                                              onsubmit="return confirm('Deseja realmente remover esta inscrição?');">
+
+                                            <input type="hidden"
+                                                   name="id"
+                                                   value="@inscrito.Id" />
+
+                                            <button type="submit"
+                                                    class="btn btn-sm btn-outline-danger"
+                                                    title="Remover inscrição">
+
+                                                <i class="bi bi-trash"></i>
+                                            </button>
+
+                                        </form>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+
+                    </table>
+                </div>
+            }
+
+        </div>
+    </div>
+
+</div>

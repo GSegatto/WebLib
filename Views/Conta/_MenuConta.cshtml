@@ -1,0 +1,7 @@
+@{ var atual = ViewContext.RouteData.Values["action"]?.ToString(); }
+<div class="list-group mb-4">
+    <a asp-action="Perfil" class="list-group-item list-group-item-action @(atual == "Perfil" ? "active" : "")">Meu perfil</a>
+    <a asp-action="MeusEmprestimos" class="list-group-item list-group-item-action @(atual == "MeusEmprestimos" ? "active" : "")">Meus empréstimos</a>
+    <a asp-action="Senha" class="list-group-item list-group-item-action @(atual == "Senha" ? "active" : "")">Alterar senha</a>
+    <a asp-action="Preferencias" class="list-group-item list-group-item-action @(atual == "Preferencias" ? "active" : "")">Preferências</a>
+</div>

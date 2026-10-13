@@ -1,0 +1,39 @@
+@model EmprestimoFormViewModel
+@{ ViewData["Title"] = "Novo empréstimo"; }
+
+<h1 class="h3 mb-3">Novo empréstimo</h1>
+
+<form method="post" class="col-md-8">
+    @Html.AntiForgeryToken()
+    <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+
+    <div class="mb-3">
+        <label asp-for="UsuarioId" class="form-label"></label>
+        <select asp-for="UsuarioId" asp-items="Model.Usuarios" class="form-select">
+            <option value="">Selecione...</option>
+        </select>
+        <span asp-validation-for="UsuarioId" class="text-danger"></span>
+    </div>
+    <div class="mb-3">
+        <label asp-for="ExemplarId" class="form-label"></label>
+        <select asp-for="ExemplarId" asp-items="Model.Exemplares" class="form-select">
+            <option value="">Selecione...</option>
+        </select>
+        <span asp-validation-for="ExemplarId" class="text-danger"></span>
+    </div>
+    <div class="row">
+        <div class="col-md-6 mb-3">
+            <label asp-for="DataRetirada" class="form-label"></label>
+            <input asp-for="DataRetirada" class="form-control" type="date" />
+            <span asp-validation-for="DataRetirada" class="text-danger"></span>
+        </div>
+        <div class="col-md-6 mb-3">
+            <label asp-for="DataPrevistaDevolucao" class="form-label"></label>
+            <input asp-for="DataPrevistaDevolucao" class="form-control" type="date" />
+            <span asp-validation-for="DataPrevistaDevolucao" class="text-danger"></span>
+        </div>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Registrar retirada</button>
+    <a asp-action="Index" class="btn btn-link">Cancelar</a>
+</form>

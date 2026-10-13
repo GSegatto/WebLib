@@ -1,0 +1,453 @@
+
+@using Biblioteca.Models
+@model AcervoViewModel
+
+@{
+    ViewData["Title"] = "Empréstimos";
+}
+
+<div class="emprestimos-pagina">
+
+    @* Cabeçalho *@
+    <div class="emprestimos-cabecalho">
+        <div>
+            <h1 class="h3 mb-1">Empréstimos</h1>
+            <p class="text-body-secondary mb-0">
+                Gerencie as solicitações, retiradas e devoluções de livros.
+            </p>
+        </div>
+
+        <div class="emprestimos-cabecalho-acoes">
+            <a asp-action="Novo" class="btn btn-primary">
+                <i class="bi bi-plus-lg me-1"></i>
+                Novo empréstimo
+            </a>
+
+            <a asp-action="Historico" class="btn btn-outline-secondary">
+                <i class="bi bi-clock-history me-1"></i>
+                Histórico
+            </a>
+        </div>
+    </div>
+
+    @* Solicitações pendentes *@
+    <section class="emprestimos-secao">
+        <div class="emprestimos-secao-titulo">
+            <h2>Solicitações pendentes</h2>
+            <span class="emprestimos-contador">
+                @Model.SolicitacoesPendentes.Count
+            </span>
+        </div>
+
+        @if (!Model.SolicitacoesPendentes.Any())
+        {
+            <div class="emprestimos-vazio">
+                <i class="bi bi-inbox"></i>
+                <p>Não há solicitações aguardando aprovação.</p>
+            </div>
+        }
+        else
+        {
+            <div class="table-responsive emprestimos-tabela-container">
+                <table class="table table-striped align-middle emprestimos-tabela">
+                    <thead>
+                        <tr>
+                            <th>Livro</th>
+                            <th>Exemplar</th>
+                            <th>Usuário</th>
+                            <th class="text-end">Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var e in Model.SolicitacoesPendentes)
+                        {
+                            <tr>
+                                <td class="emprestimos-livro">@e.Titulo</td>
+                                <td>@e.NumeroExemplar</td>
+                                <td>@e.Usuario</td>
+                                <td>
+                                    <div class="emprestimos-acoes">
+                                        <form asp-action="Aprovar"
+                                              asp-route-id="@e.Id"
+                                              method="post">
+                                            <button type="submit"
+                                                    class="btn btn-sm btn-success">
+                                                Aprovar
+                                            </button>
+                                        </form>
+
+                                        <form asp-action="Recusar"
+                                              asp-route-id="@e.Id"
+                                              method="post"
+                                              onsubmit="return confirm('Deseja realmente recusar esta solicitação?');">
+                                            <button type="submit"
+                                                    class="btn btn-sm btn-outline-danger">
+                                                Recusar
+                                            </button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+    </section>
+
+    @* Solicitações aprovadas aguardando retirada *@
+    <section class="emprestimos-secao">
+        <div class="emprestimos-secao-titulo">
+            <h2>Aguardando retirada</h2>
+            <span class="emprestimos-contador">
+                @Model.AguardandoRetirada.Count
+            </span>
+        </div>
+
+        @if (!Model.AguardandoRetirada.Any())
+        {
+            <div class="emprestimos-vazio">
+                <i class="bi bi-book"></i>
+                <p>Não há livros aguardando retirada.</p>
+            </div>
+        }
+        else
+        {
+            <div class="table-responsive emprestimos-tabela-container">
+                <table class="table table-striped align-middle emprestimos-tabela">
+                    <thead>
+                        <tr>
+                            <th>Livro</th>
+                            <th>Exemplar</th>
+                            <th>Usuário</th>
+                            <th>Status</th>
+                            <th class="text-end">Ação</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var e in Model.AguardandoRetirada)
+                        {
+                            <tr>
+                                <td class="emprestimos-livro">@e.Titulo</td>
+                                <td>@e.NumeroExemplar</td>
+                                <td>@e.Usuario</td>
+                                <td>
+                                    <span class="badge text-bg-info">
+                                        Reservado
+                                    </span>
+                                </td>
+                                <td>
+                                    <div class="emprestimos-acoes">
+                                        <form asp-action="RegistrarRetirada"
+                                              asp-route-id="@e.Id"
+                                              method="post"
+                                              onsubmit="return confirm('Confirmar que o usuário retirou o livro fisicamente?');">
+                                            <button type="submit"
+                                                    class="btn btn-sm btn-primary">
+                                                Registrar retirada
+                                            </button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+    </section>
+
+    @* Empréstimos em andamento *@
+    <section class="emprestimos-secao">
+        <div class="emprestimos-secao-titulo">
+            <h2>Livros emprestados</h2>
+            <span class="emprestimos-contador">
+                @Model.Emprestados.Count
+            </span>
+        </div>
+
+        @if (!Model.Emprestados.Any())
+        {
+            <div class="emprestimos-vazio">
+                <i class="bi bi-journal-bookmark"></i>
+                <p>Nenhum livro emprestado no momento.</p>
+            </div>
+        }
+        else
+        {
+            <div class="table-responsive emprestimos-tabela-container">
+                <table class="table table-striped align-middle emprestimos-tabela">
+                    <thead>
+                        <tr>
+                            <th>Livro</th>
+                            <th>Exemplar</th>
+                            <th>Usuário</th>
+                            <th>Retirada</th>
+                            <th>Devolução prevista</th>
+                            <th>Status</th>
+                            <th class="text-end">Ação</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var e in Model.Emprestados)
+                        {
+                            <tr>
+                                <td class="emprestimos-livro">@e.Titulo</td>
+                                <td>@e.NumeroExemplar</td>
+                                <td>@e.Usuario</td>
+                                <td>
+                                    @(e.DataRetirada?.ToString("dd/MM/yyyy") ?? "—")
+                                </td>
+                                <td>
+                                    @(e.DataPrevistaDevolucao?.ToString("dd/MM/yyyy") ?? "—")
+                                </td>
+                                <td>
+                                    @if (e.Atrasado)
+                                    {
+                                        <span class="badge text-bg-danger">
+                                            Atrasado
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge text-bg-warning">
+                                            Em andamento
+                                        </span>
+                                    }
+                                </td>
+                                <td>
+                                    <div class="emprestimos-acoes">
+                                        <form asp-action="Devolver"
+                                              asp-route-id="@e.Id"
+                                              method="post"
+                                              onsubmit="return confirm('Confirmar a devolução deste livro?');">
+                                            <button type="submit"
+                                                    class="btn btn-sm btn-success">
+                                                Registrar devolução
+                                            </button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+    </section>
+
+   
+@* Exemplares disponíveis *@
+<section class="emprestimos-secao emprestimos-catalogo">
+
+    <div class="emprestimos-secao-titulo">
+        <div>
+            <h2>Exemplares disponíveis</h2>
+            <p class="text-body-secondary mb-0 mt-1">
+                Pesquise um livro e selecione o exemplar desejado.
+            </p>
+        </div>
+
+        <span class="emprestimos-contador" id="totalLivrosDisponiveis">
+            @Model.Disponiveis.Select(e => e.LivroId).Distinct().Count()
+        </span>
+    </div>
+
+    @* Pesquisa *@
+    <div class="emprestimos-pesquisa">
+        <i class="bi bi-search"></i>
+
+        <input type="search"
+               id="pesquisaLivrosDisponiveis"
+               class="form-control"
+               placeholder="Pesquisar por título ou ISBN..."
+               autocomplete="off"
+               aria-label="Pesquisar livros disponíveis" />
+
+        <button type="button"
+                id="limparPesquisaLivros"
+                class="btn btn-outline-secondary"
+                hidden>
+            Limpar
+        </button>
+    </div>
+
+    @if (!Model.Disponiveis.Any())
+    {
+        <div class="emprestimos-vazio">
+            <i class="bi bi-journal-x"></i>
+            <p>Nenhum exemplar disponível no momento.</p>
+        </div>
+    }
+    else
+    {
+        var grupos = Model.Disponiveis
+            .GroupBy(e => e.LivroId)
+            .OrderBy(g => g.First().Titulo)
+            .ToList();
+
+        <div class="emprestimos-lista-livros" id="listaLivrosDisponiveis">
+
+            @foreach (var grupo in grupos)
+            {
+                var livro = grupo.First();
+
+                <details class="emprestimos-livro-item"
+                         data-titulo="@livro.Titulo"
+                         data-isbn="@livro.Isbn">
+
+                    <summary class="emprestimos-livro-resumo">
+
+                        <div class="emprestimos-livro-capa">
+                            @if (!string.IsNullOrWhiteSpace(livro.Capa))
+                            {
+                                <img src="@livro.Capa"
+                                    alt="Capa de @livro.Titulo"
+                                    loading="lazy" />
+                            }
+                            else
+                            {
+                                <i class="bi bi-book"></i>
+                            }
+                        </div>
+
+                        <div class="emprestimos-livro-info">
+                            <h3>@livro.Titulo</h3>
+
+                            <span>
+                                ISBN: @(string.IsNullOrWhiteSpace(livro.Isbn)
+                                    ? "Não informado"
+                                    : livro.Isbn)
+                            </span>
+
+                            <span class="emprestimos-disponibilidade">
+                                @grupo.Count()
+                                @(grupo.Count() == 1
+                                    ? "exemplar disponível"
+                                    : "exemplares disponíveis")
+                            </span>
+                        </div>
+
+                        <i class="bi bi-chevron-down emprestimos-seta"></i>
+
+                    </summary>
+
+                    <div class="emprestimos-livro-detalhes">
+
+                        <p class="emprestimos-instrucao">
+                            Selecione o exemplar que deseja registrar:
+                        </p>
+
+                        <form asp-action="Novo"
+                              method="get"
+                              class="emprestimos-form-selecao">
+
+                            @foreach (var exemplar in grupo.OrderBy(e => e.NumeroExemplar))
+                            {
+                                <label class="emprestimos-exemplar-opcao">
+
+                                    <input type="radio"
+                                           name="exemplarId"
+                                           value="@exemplar.Id"
+                                           required />
+
+                                    <span class="emprestimos-exemplar-info">
+                                        <strong>
+                                            Tombo: @exemplar.NumeroExemplar
+                                        </strong>
+
+                                        <small>Exemplar disponível</small>
+                                    </span>
+
+                                    <span class="badge text-bg-success">
+                                        Disponível
+                                    </span>
+
+                                </label>
+                            }
+
+                            <div class="emprestimos-form-rodape">
+                                <button type="submit"
+                                        class="btn btn-primary">
+                                    <i class="bi bi-plus-lg me-1"></i>
+                                    Registrar empréstimo
+                                </button>
+                            </div>
+
+                        </form>
+                    </div>
+
+                </details>
+            }
+
+        </div>
+
+        <div id="nenhumLivroEncontrado"
+             class="emprestimos-vazio"
+             hidden>
+            <i class="bi bi-search"></i>
+            <p>Nenhum livro encontrado para essa pesquisa.</p>
+        </div>
+    }
+
+</section>
+
+<script>
+    (() => {
+        const pesquisa = document.getElementById('pesquisaLivrosDisponiveis');
+        const limpar = document.getElementById('limparPesquisaLivros');
+        const lista = document.getElementById('listaLivrosDisponiveis');
+        const contador = document.getElementById('totalLivrosDisponiveis');
+        const mensagemVazia = document.getElementById('nenhumLivroEncontrado');
+
+        if (!pesquisa || !lista) return;
+
+        const livros = Array.from(
+            lista.querySelectorAll('.emprestimos-livro-item')
+        );
+
+        function filtrarLivros() {
+            const termo = pesquisa.value
+                .trim()
+                .toLocaleLowerCase('pt-BR');
+
+            let encontrados = 0;
+
+            livros.forEach(livro => {
+                const titulo = (livro.dataset.titulo || '')
+                    .toLocaleLowerCase('pt-BR');
+
+                const isbn = (livro.dataset.isbn || '')
+                    .toLocaleLowerCase('pt-BR');
+
+                const corresponde =
+                    titulo.includes(termo) ||
+                    isbn.includes(termo);
+
+                livro.hidden = !corresponde;
+
+                if (corresponde) encontrados++;
+            });
+
+            if (contador) {
+                contador.textContent = encontrados;
+            }
+
+            if (mensagemVazia) {
+                mensagemVazia.hidden = encontrados !== 0;
+            }
+
+            limpar.hidden = termo.length === 0;
+        }
+
+        pesquisa.addEventListener('input', filtrarLivros);
+
+        limpar.addEventListener('click', () => {
+            pesquisa.value = '';
+            filtrarLivros();
+            pesquisa.focus();
+        });
+    })();
+</script>
+
+</div>

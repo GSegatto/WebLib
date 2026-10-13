@@ -1,0 +1,22 @@
+@{ ViewData["Title"] = "Preferências"; }
+
+<div class="row">
+    <div class="col-md-3"><partial name="_MenuConta" /></div>
+    <div class="col-md-9">
+        <h1 class="h4 mb-3">Preferências</h1>
+        <p class="text-body-secondary">As preferências são aplicadas na hora e ficam salvas neste navegador.</p>
+
+        <div class="card mb-3"><div class="card-body">
+            <h2 class="h6">Aparência</h2>
+            <div class="form-check"><input class="form-check-input" type="radio" name="tema" id="t-auto" value="auto" /><label class="form-check-label" for="t-auto">Automático (segue o sistema)</label></div>
+            <div class="form-check"><input class="form-check-input" type="radio" name="tema" id="t-claro" value="claro" /><label class="form-check-label" for="t-claro">☀️ Claro</label></div>
+            <div class="form-check"><input class="form-check-input" type="radio" name="tema" id="t-escuro" value="escuro" /><label class="form-check-label" for="t-escuro">🌙 Escuro</label></div>
+        </div></div>
+
+        <div class="card"><div class="card-body">
+            <h2 class="h6">Tamanho do texto</h2>
+            <div class="form-check"><input class="form-check-input" type="radio" name="fonte" id="f-normal" value="normal" /><label class="form-check-label" for="f-normal">Normal</label></div>
+            <div class="form-check"><input class="form-check-input" type="radio" name="fonte" id="f-grande" value="grande" /><label class="form-check-label" for="f-grande">Grande</label></div>
+        </div></div>
+    </div>
+</div>

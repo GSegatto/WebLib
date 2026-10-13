@@ -1,0 +1,70 @@
+@using Biblioteca.Models
+
+@model List<EmprestimoListaViewModel>
+@{ ViewData["Title"] = "Histórico de empréstimos"; }
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h1 class="h3 mb-0">Histórico de empréstimos</h1>
+    <a asp-action="Index" class="btn btn-link">Voltar</a>
+</div>
+
+@if (!Model.Any())
+{
+    <div class="alert alert-info">Nenhum empréstimo registrado.</div>
+}
+else
+{
+    <div class="table-responsive">
+    <table class="table table-striped align-middle">
+        <thead><tr><th>Livro</th><th>Exemplar</th><th>Usuário</th><th>Retirada</th><th>Prevista</th><th>Devolvido em</th><th>Status</th></tr></thead>
+        <tbody>
+        @foreach (var e in Model)
+        {
+            <tr>
+                <td>@e.Titulo</td>
+                <td>@e.NumeroExemplar</td>
+                <td>@e.Usuario</td>
+                <td>@(e.DataRetirada?.ToString("dd/MM/yyyy") ?? "—")</td>
+                <td>@(e.DataPrevistaDevolucao?.ToString("dd/MM/yyyy") ?? "—")</td>
+                <td>@(e.DataDevolucao?.ToString("dd/MM/yyyy") ?? "—")</td>
+<td>
+    @switch (e.Status)
+    {
+        case StatusEmprestimo.Pendente:
+            <span class="badge text-bg-secondary">Pendente</span>
+            break;
+
+        case StatusEmprestimo.AguardandoRetirada:
+            <span class="badge text-bg-info">Aguardando retirada</span>
+            break;
+
+        case StatusEmprestimo.EmAndamento:
+            if (e.Atrasado)
+            {
+                <span class="badge text-bg-danger">Atrasado</span>
+            }
+            else
+            {
+                <span class="badge text-bg-warning">Em andamento</span>
+            }
+            break;
+
+        case StatusEmprestimo.Concluido:
+            <span class="badge text-bg-success">Devolvido</span>
+            break;
+
+        case StatusEmprestimo.Recusado:
+            <span class="badge text-bg-danger">Recusado</span>
+            break;
+
+        case StatusEmprestimo.Cancelado:
+            <span class="badge text-bg-secondary">Cancelado</span>
+            break;
+    }
+</td>
+            </tr>
+        }
+        </tbody>
+    </table>
+    </div>
+}

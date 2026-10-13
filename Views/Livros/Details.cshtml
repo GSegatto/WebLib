@@ -1,0 +1,393 @@
+@model LivroDetalhesViewModel
+
+@{
+    var admin = User.IsInRole(Perfis.Admin);
+    var autenticado = User.Identity?.IsAuthenticated == true;
+
+    ViewData["Title"] = Model.Titulo;
+}
+
+<div class="container py-4">
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="mb-1">
+                @Model.Titulo
+            </h2>
+
+            <p class="text-muted mb-0">
+                Informações e exemplares disponíveis deste livro.
+            </p>
+        </div>
+
+        <div class="d-flex gap-2">
+
+            @if (admin)
+            {
+                <a asp-action="Edit"
+                   asp-route-id="@Model.Id"
+                   class="btn btn-outline-secondary">
+
+                    <i class="bi bi-pencil me-1"></i>
+                    Editar
+
+                </a>
+            }
+
+            <a asp-action="Index"
+               class="btn btn-outline-secondary">
+
+                <i class="bi bi-arrow-left me-1"></i>
+                Voltar
+
+            </a>
+
+        </div>
+    </div>
+
+    @* =====================================================
+       CARD PRINCIPAL: capa (esquerda) + dados e descrição (direita)
+       ===================================================== *@
+    <div class="card shadow-sm border-0 mb-4">
+        <div class="card-body">
+
+            <div class="row g-4 align-items-start">
+
+                @* ---------- COLUNA DA ESQUERDA: CAPA ---------- *@
+                <div class="col-md-4 col-lg-3">
+
+                    <div class="livro-capa-wrapper">
+
+                        <div class="livro-capa livro-capa-detalhes"
+                             style="@(string.IsNullOrWhiteSpace(Model.Capa)
+                                 ? ""
+                                 : $"background-image: url('{Model.Capa}');")">
+
+                            @if (autenticado)
+                            {
+                                <form asp-action="@(Model.Favoritado ? "Desfavoritar" : "Favoritar")"
+                                      asp-route-id="@Model.Id"
+                                      method="post"
+                                      class="favorito-form">
+
+                                    @Html.AntiForgeryToken()
+
+                                    <button type="submit"
+                                            class="favorito-btn"
+                                            title="@(Model.Favoritado ? "Remover dos favoritos" : "Adicionar aos favoritos")"
+                                            aria-label="@(Model.Favoritado ? "Remover dos favoritos" : "Adicionar aos favoritos")">
+
+                                        <i class="bi @(Model.Favoritado ? "bi-heart-fill" : "bi-heart")"></i>
+
+                                    </button>
+
+                                </form>
+                            }
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+                @* ---------- COLUNA DA DIREITA: DADOS + SOBRE O LIVRO ---------- *@
+                <div class="col-md-8 col-lg-9">
+
+                    <div class="row">
+
+                        <div class="col-md-6">
+
+                            <dl class="row mb-0">
+
+                                <dt class="col-sm-4">
+                                    Autores
+                                </dt>
+
+                                <dd class="col-sm-8">
+                                    @Model.Autores
+                                </dd>
+
+                                <dt class="col-sm-4">
+                                    Categoria
+                                </dt>
+
+                                <dd class="col-sm-8">
+                                    @Model.Categoria
+                                </dd>
+
+                                <dt class="col-sm-4">
+                                    Editora
+                                </dt>
+
+                                <dd class="col-sm-8">
+                                    @Model.Editora
+                                </dd>
+
+                            </dl>
+
+                        </div>
+
+                        <div class="col-md-6">
+
+                            <dl class="row mb-0">
+
+                                <dt class="col-sm-5">
+                                    Ano de publicação
+                                </dt>
+
+                                <dd class="col-sm-7">
+                                    @Model.AnoPublicacao
+                                </dd>
+
+                                <dt class="col-sm-5">
+                                    ISBN
+                                </dt>
+
+                                <dd class="col-sm-7">
+                                    @Model.Isbn
+                                </dd>
+
+                            </dl>
+
+                        </div>
+
+                    </div>
+
+                    @* Sobre o livro: agora ao lado da capa, abaixo dos dados *@
+                    @if (!string.IsNullOrWhiteSpace(Model.Descricao))
+                    {
+                        <hr class="my-4" />
+
+                        <h5 class="mb-3">
+                            Sobre o livro
+                        </h5>
+
+                        @* Se a descrição for muito longa, ela rola dentro do próprio box.
+                           Ajuste ou remova o max-height se preferir. *@
+                        <div class="text-muted"
+                             style="line-height: 1.8; white-space: pre-line; max-height: 320px; overflow-y: auto; padding-right: .5rem;">
+                            @Model.Descricao
+                        </div>
+                    }
+
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+
+    <div class="d-flex justify-content-between align-items-center mb-3">
+
+        <div>
+            <h4 class="mb-1">
+                Exemplares
+            </h4>
+
+            <p class="text-muted mb-0">
+                Consulte a situação dos exemplares deste livro.
+            </p>
+        </div>
+
+    </div>
+
+    @if (admin)
+    {
+        <div class="card shadow-sm border-0 mb-4">
+
+            <div class="card-body">
+
+                <h6 class="mb-3">
+                    <i class="bi bi-plus-circle me-2"></i>
+                    Adicionar exemplar
+                </h6>
+
+                <form asp-controller="Exemplares"
+                      asp-action="Create"
+                      method="post"
+                      class="row g-2">
+
+                    @Html.AntiForgeryToken()
+
+                    <input type="hidden"
+                           name="LivroId"
+                           value="@Model.Id" />
+
+                    <div class="col-md-6">
+
+                        <input name="NumeroExemplar"
+                               class="form-control"
+                               placeholder="Nº do exemplar (tombo)"
+                               maxlength="20"
+                               required />
+
+                    </div>
+
+                    <div class="col-md-auto">
+
+                        <button type="submit"
+                                class="btn btn-primary">
+
+                            <i class="bi bi-plus-lg me-1"></i>
+                            Adicionar exemplar
+
+                        </button>
+
+                    </div>
+
+                </form>
+
+            </div>
+
+        </div>
+    }
+
+    <div class="card shadow-sm border-0">
+
+        <div class="card-body p-0">
+
+            @if (!Model.Exemplares.Any())
+            {
+                <div class="text-center py-5">
+
+                    <i class="bi bi-bookmark-x fs-1 text-muted"></i>
+
+                    <h5 class="mt-3">
+                        Nenhum exemplar cadastrado
+                    </h5>
+
+                    <p class="text-muted mb-0">
+                        Este livro ainda não possui exemplares cadastrados.
+                    </p>
+
+                </div>
+            }
+            else
+            {
+                <div class="table-responsive">
+
+                    <table class="table table-hover align-middle mb-0">
+
+                        <thead>
+                            <tr>
+                                <th class="ps-4">
+                                    Exemplar
+                                </th>
+
+                                <th>
+                                    Situação
+                                </th>
+
+                                <th class="text-end pe-4">
+                                    Ações
+                                </th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+
+                            @foreach (var e in Model.Exemplares)
+                            {
+                                <tr>
+
+                                    <td class="ps-4">
+
+                                        <i class="bi bi-bookmark me-2 text-muted"></i>
+
+                                        @e.NumeroExemplar
+
+                                    </td>
+
+                                    <td>
+
+                                        <span class="badge @(e.Disponivel
+                                            ? "text-bg-success"
+                                            : "text-bg-warning")">
+
+                                            @e.Situacao
+
+                                        </span>
+
+                                    </td>
+
+                                    <td class="text-end pe-4">
+
+                                        @if (admin)
+                                        {
+                                            <form asp-controller="Exemplares"
+                                                  asp-action="Delete"
+                                                  asp-route-id="@e.Id"
+                                                  method="post"
+                                                  class="d-inline"
+                                                  onsubmit="return confirm('Deseja realmente excluir este exemplar?');">
+
+                                                @Html.AntiForgeryToken()
+
+                                                <button type="submit"
+                                                        class="btn btn-sm btn-outline-danger"
+                                                        title="Excluir exemplar">
+
+                                                    <i class="bi bi-trash"></i>
+
+                                                </button>
+
+                                            </form>
+                                        }
+                                        else if (autenticado && e.Disponivel)
+                                        {
+                                            <form asp-controller="Emprestimos"
+                                                  asp-action="Solicitar"
+                                                  method="post"
+                                                  class="d-inline"
+                                                  onsubmit="return confirm('Pegar este exemplar emprestado por 14 dias?');">
+
+                                                @Html.AntiForgeryToken()
+
+                                                <input type="hidden"
+                                                       name="exemplarId"
+                                                       value="@e.Id" />
+
+                                                <input type="hidden"
+                                                       name="livroId"
+                                                       value="@Model.Id" />
+
+                                                <button type="submit"
+                                                        class="btn btn-sm btn-success">
+
+                                                    <i class="bi bi-bookmark-plus me-1"></i>
+                                                    Pegar emprestado
+
+                                                </button>
+
+                                            </form>
+                                        }
+                                        else if (!autenticado && e.Disponivel)
+                                        {
+                                            <a asp-controller="Conta"
+                                               asp-action="Login"
+                                               asp-route-returnUrl="@($"/Livros/Details/{Model.Id}")"
+                                               class="btn btn-sm btn-outline-primary">
+
+                                                <i class="bi bi-box-arrow-in-right me-1"></i>
+                                                Entre para pegar emprestado
+
+                                            </a>
+                                        }
+
+                                    </td>
+
+                                </tr>
+                            }
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+            }
+
+        </div>
+
+    </div>
+
+</div>

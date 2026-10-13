@@ -1,0 +1,308 @@
+@model LivrosIndexViewModel
+
+@{
+    var admin = User.IsInRole(Perfis.Admin);
+    ViewData["Title"] = admin ? "Livros" : "Catálogo";
+}
+
+<div class="container py-4">
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="mb-1">
+                @ViewData["Title"]
+            </h2>
+
+            <p class="text-muted mb-0">
+                @(admin
+                    ? "Gerencie os livros cadastrados na biblioteca."
+                    : "Encontre livros e consulte sua disponibilidade.")
+            </p>
+        </div>
+
+        @if (admin)
+        {
+            <a asp-action="Create" class="btn btn-primary">
+                <i class="bi bi-plus-lg me-1"></i>
+                Novo livro
+            </a>
+        }
+    </div>
+
+
+    <!-- FILTROS -->
+
+    <div class="card shadow-sm border-0 mb-4">
+        <div class="card-body">
+
+            <form method="get" class="row g-3">
+
+                <div class="col-md-6">
+
+                    <label asp-for="Q" class="form-label">
+                        Buscar
+                    </label>
+
+                    <div class="input-group">
+
+                        <span class="input-group-text">
+                            <i class="bi bi-search"></i>
+                        </span>
+
+                        <input asp-for="Q"
+                               class="form-control"
+                               placeholder="Título, autor, editora ou ISBN" />
+
+                    </div>
+
+                </div>
+
+
+                <div class="col-md-4">
+
+                    <label asp-for="CategoriaId" class="form-label">
+                        Categoria
+                    </label>
+
+                    <select asp-for="CategoriaId"
+                            asp-items="Model.Categorias"
+                            class="form-select">
+
+                        <option value="">
+                            Todas as categorias
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <div class="col-md-2 d-flex align-items-end">
+
+                    <button type="submit"
+                            class="btn btn-outline-primary w-100">
+
+                        <i class="bi bi-search me-1"></i>
+                        Buscar
+
+                    </button>
+
+                </div>
+
+            </form>
+
+        </div>
+    </div>
+
+
+    <!-- NENHUM LIVRO -->
+
+    @if (!Model.Livros.Any())
+    {
+        <div class="card shadow-sm border-0">
+
+            <div class="card-body text-center py-5">
+
+                <i class="bi bi-book fs-1 text-muted"></i>
+
+                <h5 class="mt-3">
+                    Nenhum livro encontrado
+                </h5>
+
+                <p class="text-muted mb-0">
+                    Tente alterar os filtros ou cadastrar um novo livro.
+                </p>
+
+            </div>
+
+        </div>
+    }
+    else
+    {
+
+        <!-- LIVROS -->
+
+        <div class="row row-cols-2 row-cols-md-3 row-cols-lg-4 g-4">
+
+            @foreach (var l in Model.Livros)
+            {
+                <div class="col">
+
+                    <div class="card livro-card h-100">
+
+
+                        <!-- CAPA -->
+
+                        <div class="livro-capa-wrapper">
+
+                            <a asp-action="Details"
+                               asp-route-id="@l.Id"
+                               class="livro-capa"
+                               aria-label="Ver @l.Titulo"
+                               style="@(string.IsNullOrWhiteSpace(l.Capa)
+                                    ? ""
+                                    : $"background-image: url('{l.Capa}');")">
+                            </a>
+
+
+                            <!-- FAVORITO -->
+
+                            @if (User.Identity?.IsAuthenticated == true)
+                            {
+                                <form asp-action="@(l.Favoritado
+                                                  ? "Desfavoritar"
+                                                  : "Favoritar")"
+                                      asp-route-id="@l.Id"
+                                      method="post"
+                                      class="favorito-form">
+
+                                    @Html.AntiForgeryToken()
+
+                                    <button type="submit"
+                                            class="favorito-btn"
+                                            title="@(l.Favoritado
+                                                   ? "Remover dos favoritos"
+                                                   : "Adicionar aos favoritos")"
+                                            aria-label="@(l.Favoritado
+                                                         ? "Remover dos favoritos"
+                                                         : "Adicionar aos favoritos")">
+
+                                        <i class="bi @(l.Favoritado
+                                                   ? "bi-heart-fill"
+                                                   : "bi-heart")"></i>
+
+                                    </button>
+
+                                </form>
+                            }
+
+                        </div>
+
+
+                        <!-- INFORMAÇÕES -->
+
+                        <div class="card-body d-flex flex-column">
+
+                            <h5 class="livro-titulo">
+                                @l.Titulo
+                            </h5>
+
+
+                            <p class="livro-meta mb-1">
+
+                                <i class="bi bi-person me-1"></i>
+
+                                @l.Autores
+
+                            </p>
+
+
+                            <p class="livro-meta mb-3">
+
+                                <i class="bi bi-tag me-1"></i>
+
+                                @l.Categoria · @l.AnoPublicacao
+
+                            </p>
+
+
+                            <!-- DISPONIBILIDADE -->
+
+                            <div class="mb-3">
+
+                                @if (l.ExemplaresDisponiveis > 0)
+                                {
+                                    <span class="badge text-bg-success">
+
+                                        <i class="bi bi-check-circle me-1"></i>
+
+                                        @l.ExemplaresDisponiveis disponível(is)
+
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span class="badge text-bg-secondary">
+
+                                        Indisponível
+
+                                    </span>
+                                }
+
+                            </div>
+
+
+                            <!-- ISBN ADMIN -->
+
+                            @if (admin)
+                            {
+                                <p class="livro-meta mb-3">
+
+                                    <i class="bi bi-upc me-1"></i>
+
+                                    ISBN @l.Isbn
+
+                                </p>
+                            }
+
+
+                            <!-- AÇÕES -->
+
+                            <div class="livro-acoes mt-auto">
+
+                                <a asp-action="Details"
+                                   asp-route-id="@l.Id"
+                                   class="btn btn-sm btn-outline-primary">
+
+                                    <i class="bi bi-eye me-1"></i>
+
+                                    @(admin ? "Detalhes" : "Ver / pegar")
+
+                                </a>
+
+
+                                @if (admin)
+                                {
+                                    <a asp-action="Edit"
+                                       asp-route-id="@l.Id"
+                                       class="btn btn-sm btn-outline-secondary"
+                                       title="Editar livro">
+
+                                        <i class="bi bi-pencil"></i>
+
+                                    </a>
+
+
+                                    <form asp-action="Delete"
+                                          asp-route-id="@l.Id"
+                                          method="post"
+                                          class="d-inline"
+                                          onsubmit="return confirm('Deseja realmente excluir este livro?');">
+
+                                        @Html.AntiForgeryToken()
+
+                                        <button type="submit"
+                                                class="btn btn-sm btn-outline-danger"
+                                                title="Excluir livro">
+
+                                            <i class="bi bi-trash"></i>
+
+                                        </button>
+
+                                    </form>
+                                }
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+            }
+
+        </div>
+
+    }
+
+</div>

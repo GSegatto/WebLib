@@ -1,0 +1,24 @@
+@model PerfilViewModel
+@{ ViewData["Title"] = "Meu perfil"; }
+
+<div class="row">
+    <div class="col-md-3"><partial name="_MenuConta" /></div>
+    <div class="col-md-9">
+        <h1 class="h4 mb-3">Meu perfil <span class="badge @(Model.Tipo == Perfis.Admin ? "text-bg-danger" : "text-bg-secondary") align-middle">@Model.Tipo</span></h1>
+        <form method="post" class="col-lg-8">
+            @Html.AntiForgeryToken()
+            <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+            <div class="mb-3">
+                <label asp-for="Nome" class="form-label"></label>
+                <input asp-for="Nome" class="form-control" />
+                <span asp-validation-for="Nome" class="text-danger"></span>
+            </div>
+            <div class="mb-3">
+                <label asp-for="Email" class="form-label"></label>
+                <input asp-for="Email" class="form-control" type="email" />
+                <span asp-validation-for="Email" class="text-danger"></span>
+            </div>
+            <button class="btn btn-primary">Salvar alterações</button>
+        </form>
+    </div>
+</div>

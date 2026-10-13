@@ -1,0 +1,214 @@
+@using Biblioteca.Models
+@model MeusEmprestimosViewModel
+
+@{
+    ViewData["Title"] = "Meus empréstimos";
+}
+
+<div class="row">
+    <div class="col-md-3">
+        <partial name="_MenuConta" />
+    </div>
+
+    <div class="col-md-9">
+        <h1 class="h4 mb-1">Meus empréstimos</h1>
+
+        <p class="text-body-secondary">
+            Em andamento: <strong>@Model.EmAberto.Count</strong>
+            de @Model.Limite permitidos.
+            A devolução é registrada no balcão da biblioteca.
+        </p>
+
+        @* Minhas solicitações *@
+        <h2 class="h6 mt-4">Minhas solicitações</h2>
+
+        @if (!Model.Solicitacoes.Any())
+        {
+            <p class="text-body-secondary">
+                Você não possui solicitações aguardando aprovação ou retirada.
+            </p>
+        }
+        else
+        {
+            <div class="table-responsive">
+                <table class="table table-striped align-middle">
+                    <thead>
+                        <tr>
+                            <th>Livro</th>
+                            <th>Exemplar</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var e in Model.Solicitacoes)
+                        {
+                            <tr>
+                                <td>@e.Titulo</td>
+                                <td>@e.NumeroExemplar</td>
+                                <td>
+                                    @if (e.Status == StatusEmprestimo.Pendente)
+                                    {
+                                        <span class="badge text-bg-secondary">
+                                            Aguardando aprovação
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge text-bg-info">
+                                            Aguardando retirada
+                                        </span>
+                                    }
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+
+        @* Empréstimos em andamento *@
+        <h2 class="h6 mt-4">Em andamento</h2>
+
+        @if (!Model.EmAberto.Any())
+        {
+            <div class="alert alert-info">
+                Você não tem livros emprestados no momento.
+                <a asp-controller="Livros" asp-action="Index">
+                    Buscar livros
+                </a>
+            </div>
+        }
+        else
+        {
+            <div class="table-responsive">
+                <table class="table table-striped align-middle">
+                    <thead>
+                        <tr>
+                            <th>Livro</th>
+                            <th>Exemplar</th>
+                            <th>Retirada</th>
+                            <th>Devolver até</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var e in Model.EmAberto)
+                        {
+                            <tr>
+                                <td>@e.Titulo</td>
+                                <td>@e.NumeroExemplar</td>
+                                <td>
+                                    @(e.DataRetirada?.ToString("dd/MM/yyyy") ?? "—")
+                                </td>
+                                <td>
+                                    @(e.DataPrevistaDevolucao?.ToString("dd/MM/yyyy") ?? "—")
+                                </td>
+                                <td>
+                                    @if (e.Atrasado)
+                                    {
+                                        <span class="badge text-bg-danger">
+                                            Atrasado
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge text-bg-warning">
+                                            Em andamento
+                                        </span>
+                                    }
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+
+        @* Histórico de devoluções *@
+        <h2 class="h6 mt-4">Histórico de devoluções</h2>
+
+        @if (!Model.Devolvidos.Any())
+        {
+            <p class="text-body-secondary">
+                Nenhum empréstimo devolvido ainda.
+            </p>
+        }
+        else
+        {
+            <div class="table-responsive">
+                <table class="table table-sm align-middle">
+                    <thead>
+                        <tr>
+                            <th>Livro</th>
+                            <th>Exemplar</th>
+                            <th>Retirada</th>
+                            <th>Devolvido em</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var e in Model.Devolvidos)
+                        {
+                            <tr>
+                                <td>@e.Titulo</td>
+                                <td>@e.NumeroExemplar</td>
+                                <td>
+                                    @(e.DataRetirada?.ToString("dd/MM/yyyy") ?? "—")
+                                </td>
+                                <td>
+                                    @(e.DataDevolucao?.ToString("dd/MM/yyyy") ?? "—")
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+
+        @* Solicitações recusadas ou canceladas *@
+        <h2 class="h6 mt-4">Solicitações encerradas</h2>
+
+        @if (!Model.Encerrados.Any())
+        {
+            <p class="text-body-secondary">
+                Você não possui solicitações recusadas ou canceladas.
+            </p>
+        }
+        else
+        {
+            <div class="table-responsive">
+                <table class="table table-sm align-middle">
+                    <thead>
+                        <tr>
+                            <th>Livro</th>
+                            <th>Exemplar</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var e in Model.Encerrados)
+                        {
+                            <tr>
+                                <td>@e.Titulo</td>
+                                <td>@e.NumeroExemplar</td>
+                                <td>
+                                    @if (e.Status == StatusEmprestimo.Recusado)
+                                    {
+                                        <span class="badge text-bg-danger">
+                                            Recusado
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge text-bg-secondary">
+                                            Cancelado
+                                        </span>
+                                    }
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+    </div>
+</div>

@@ -1,0 +1,183 @@
+@{
+    ViewData["Title"] = "Sobre Nós";
+}
+
+<section class="hero hero-sm hero-sobre mb-5">
+    <div class="hero-conteudo">
+        <h1 class="h2">Sobre Nós</h1>
+
+        <p class="lead mb-0">
+            Uma biblioteca feita para aproximar pessoas e histórias.
+        </p>
+    </div>
+</section>
+
+
+<div class="row g-4 align-items-center mb-5">
+    
+    <div class="col-md-7">
+        <div class="section-title text-md-start align-items-md-start m-0 mb-3">
+            <h2>Nossa história</h2>
+            <p>Quem somos</p>
+        </div>
+
+        <p>
+            A nossa biblioteca nasceu da vontade de tornar a leitura acessível a todos.
+            <br />
+            Começamos com um pequeno acervo e, com o carinho de leitores e colaboradores,
+            crescemos até reunir obras de ficção, técnicas, infantis, clássicos e muito mais.
+        </p>
+
+        <p class="mb-0">
+            Acreditamos que um bom livro pode mudar o dia, a perspectiva e até o rumo de uma vida.
+            <br />
+            Por isso, cuidamos de cada exemplar e de cada leitor que passa por aqui.
+        </p>
+    </div>
+
+    <div class="col-md-5">
+        <div class="img-sobre"
+             role="img"
+             aria-label="Imagem da biblioteca">
+        </div>
+    </div>
+
+</div>
+
+
+
+<div class="row g-5 align-items-center mb-5">
+
+    <!-- IMAGEM -->
+    <div class="col-md-5">
+    <div class="imagem-sobre"></div>
+</div>
+
+    <!-- CARDS -->
+    <div class="col-md-7">
+
+        <div class="card feature-card mb-4">
+            <div class="card-body">
+                <h5 class="icon-titulo">
+                    <span class="icon-circulo">
+                        <i class="bi bi-book"></i>
+                    </span>
+                    Missão
+                </h5>
+
+                <p class="text-body-secondary mb-0">
+                    Incentivar o hábito da leitura, oferecendo um acervo diverso
+                    e um atendimento acolhedor.
+                </p>
+            </div>
+        </div>
+
+        <div class="card feature-card mb-4">
+            <div class="card-body">
+                <h5 class="icon-titulo">
+                    <span class="icon-circulo">
+                        <i class="bi bi-eye"></i>
+                    </span>
+                    Visão
+                </h5>
+
+                <p class="text-body-secondary mb-0">
+                    Ser referência em acesso ao conhecimento e ponto de encontro
+                    de quem ama histórias.
+                </p>
+            </div>
+        </div>
+
+        <div class="card feature-card mb-4">
+            <div class="card-body">
+                <h5 class="icon-titulo">
+                    <span class="icon-circulo">
+                        <i class="bi bi-heart"></i>
+                    </span>
+                    Valores
+                </h5>
+
+                <p class="text-body-secondary mb-0">
+                    Acolhimento, respeito, curiosidade, cuidado com o acervo
+                    e acesso para todos.
+                </p>
+            </div>
+        </div>
+
+    </div>
+
+</div>
+
+<br />
+
+   <div class="section-title text-md-start align-items-md-start m-0 mb-3">
+    <h2>Como funciona o empréstimo</h2>
+    <p>Regras da biblioteca</p>
+   </div>
+
+<div class="row g-4 mb-5">
+
+    <div class="col-md-6">
+        <div class="card h-100">
+            <div class="card-body">
+                <ul class="mb-0">
+
+                    <li class="mb-2">
+                        Crie sua conta gratuita e entre no sistema.
+                    </li>
+
+                    <li class="mb-2">
+                        Escolha um exemplar <strong>disponível</strong>
+                        no catálogo e clique em
+                        <em>"Pegar emprestado"</em>.
+                    </li>
+
+                    <li class="mb-2">
+                        O prazo padrão é de <strong>14 dias</strong>.
+                    </li>
+
+                    <li class="mb-2">
+                        Você pode ter até <strong>3 livros</strong>
+                        emprestados ao mesmo tempo.
+                    </li>
+
+                    <li class="mb-2">
+                        A devolução é registrada pela equipe,
+                        no balcão da biblioteca.
+                    </li>
+
+                    <li>
+                        Quem tem livro em atraso fica impedido
+                        de novos empréstimos até devolver.
+                    </li>
+
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6">
+    <div class="card h-100">
+        <div class="card-body d-flex flex-column justify-content-center align-items-left text-left">
+
+            <h3>Dica: use os favoritos ♡</h3><br />
+
+            <p class="text-body-secondary">
+                Gostou de um livro mas não quer pegar agora?<br />
+                Clique no coração no canto da capa para guardá-lo em
+                <strong>Meus Favoritos</strong>
+                e encontrá-lo fácil depois.
+            </p><br />
+
+            <a asp-controller="Livros"
+               asp-action="Index"
+               class="btn btn-primary btn-sm">
+                Explorar o catálogo
+            </a>
+
+        </div>
+    </div>
+</div>
+
+</div>
+

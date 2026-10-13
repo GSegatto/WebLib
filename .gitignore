@@ -1,0 +1,11 @@
+bin/
+obj/
+.vs/
+*.user
+
+# Arquivos locais e segredos
+.env
+.env.*
+!.env.example
+appsettings.Local.json
+secrets.json

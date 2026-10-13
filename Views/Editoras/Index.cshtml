@@ -1,0 +1,112 @@
+@model List<NomeViewModel>
+
+@{
+    ViewData["Title"] = "Editoras";
+}
+
+<div class="container py-4">
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="mb-1">Editoras</h2>
+
+            <p class="text-muted mb-0">
+                Gerencie as editoras cadastradas na biblioteca.
+            </p>
+        </div>
+
+        <div class="d-flex align-items-center gap-2">
+            <span class="badge text-bg-secondary fs-6">
+                @Model.Count @(Model.Count == 1 ? "editora" : "editoras")
+            </span>
+
+            <a asp-action="Create" class="btn btn-primary">
+                <i class="bi bi-plus-lg me-1"></i>
+                Nova editora
+            </a>
+        </div>
+    </div>
+
+    <div class="card shadow-sm border-0">
+        <div class="card-body p-0">
+
+            @if (!Model.Any())
+            {
+                <div class="text-center py-5">
+                    <i class="bi bi-building-x fs-1 text-muted"></i>
+
+                    <h5 class="mt-3">
+                        Nenhuma editora cadastrada
+                    </h5>
+
+                    <p class="text-muted mb-3">
+                        Cadastre a primeira editora para começar.
+                    </p>
+
+                    <a asp-action="Create" class="btn btn-primary">
+                        <i class="bi bi-plus-lg me-1"></i>
+                        Nova editora
+                    </a>
+                </div>
+            }
+            else
+            {
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+
+                        <thead>
+                            <tr>
+                                <th class="ps-4">Nome</th>
+                                <th class="text-end pe-4">Ações</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            @foreach (var item in Model)
+                            {
+                                <tr>
+                                    <td class="ps-4">
+                                        <i class="bi bi-building me-2 text-muted"></i>
+                                        @item.Nome
+                                    </td>
+
+                                    <td class="text-end pe-4">
+
+                                        <a asp-action="Edit"
+                                           asp-route-id="@item.Id"
+                                           class="btn btn-sm btn-outline-secondary"
+                                           title="Editar editora">
+
+                                            <i class="bi bi-pencil"></i>
+                                        </a>
+
+                                        <form asp-action="Delete"
+                                              asp-route-id="@item.Id"
+                                              method="post"
+                                              class="d-inline"
+                                              onsubmit="return confirm('Deseja realmente excluir esta editora?');">
+
+                                            @Html.AntiForgeryToken()
+
+                                            <button type="submit"
+                                                    class="btn btn-sm btn-outline-danger"
+                                                    title="Excluir editora">
+
+                                                <i class="bi bi-trash"></i>
+                                            </button>
+
+                                        </form>
+
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+
+                    </table>
+                </div>
+            }
+
+        </div>
+    </div>
+
+</div>

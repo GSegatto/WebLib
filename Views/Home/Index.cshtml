@@ -1,0 +1,309 @@
+@model HomeViewModel
+@{ ViewData["Title"] = "Início"; }
+
+@if (Model.Admin)
+{
+    <section class="hero hero-sm mb-4">
+        <div class="hero-conteudo">
+            <h1 class="h2">Painel do administrador</h1>
+            <p class="lead mb-0">Visão geral do acervo e dos empréstimos.</p>
+        </div>
+    </section>
+
+    <div class="row g-3 mb-4">
+        <div class="col-6 col-md"><div class="card stat-card"><div class="stat-num">@Model.TotalLivros</div><div class="text-body-secondary">Livros</div></div></div>
+        <div class="col-6 col-md"><div class="card stat-card"><div class="stat-num">@Model.ExemplaresDisponiveis</div><div class="text-body-secondary">Exemplares disponíveis</div></div></div>
+        <div class="col-6 col-md"><div class="card stat-card"><div class="stat-num">@Model.EmprestimosAbertos</div><div class="text-body-secondary">Empréstimos em aberto</div></div></div>
+        <div class="col-6 col-md"><div class="card stat-card @(Model.Atrasados > 0 ? "alerta" : "")"><div class="stat-num">@Model.Atrasados</div><div class="text-body-secondary">Atrasados</div></div></div>
+        <div class="col-6 col-md"><div class="card stat-card"><div class="stat-num">@Model.TotalUsuarios</div><div class="text-body-secondary">Usuários</div></div></div>
+    </div>
+
+    <div class="row g-3">
+        @foreach (var (titulo, ctrl, acao, texto) in new[] {
+            ("Registrar empréstimo", "Emprestimos", "Novo", "Retirada de um exemplar para um usuário."),
+            ("Disponíveis / Emprestados", "Emprestimos", "Index", "Acompanhe o acervo e registre devoluções."),
+            ("Livros", "Livros", "Index", "Cadastro de livros e exemplares."),
+            ("Usuários", "Usuarios", "Index", "Contas e perfis de acesso."),
+            ("Autores", "Autores", "Index", "Cadastro de autores."),
+            ("Categorias", "Categorias", "Index", "Classificação do acervo.") })
+        {
+            <div class="col-md-4">
+                <div class="card feature-card"><div class="card-body">
+                    <h5 class="card-title">@titulo</h5>
+                    <p class="card-text text-body-secondary">@texto</p>
+                    <a asp-controller="@ctrl" asp-action="@acao" class="btn btn-outline-primary btn-sm">Abrir</a>
+                </div></div>
+            </div>
+        }
+    </div>
+}
+else if (Model.Autenticado)
+{
+    <section class="hero hero-usuario mb-5">
+
+        <div class="hero-conteudo hero-usuario-conteudo">
+
+            <h1>
+                Bem-vindo(a), @User.Identity!.Name!
+            </h1>
+
+            <p class="lead mb-4">
+                Encontre livros e acompanhe seus empréstimos.
+            </p>
+
+            <a asp-controller="Livros"
+               asp-action="Index"
+               class="btn btn-light btn-lg">
+
+                <i class="bi bi-search me-2"></i>
+                Buscar livros
+
+            </a>
+
+        </div>
+
+        <div class="hero-usuario-cards">
+
+            <div class="hero-usuario-card">
+
+                <div class="hero-usuario-card-icon">
+                    <i class="bi bi-book"></i>
+                </div>
+
+                <div class="hero-usuario-card-content">
+
+                    <h5>
+                        Meus empréstimos
+                    </h5>
+
+                    <p>
+                        <strong>@Model.MeusAbertos</strong>
+                        empréstimo(s) em aberto
+
+                        @if (Model.MeusAtrasados > 0)
+                        {
+                            <span class="badge text-bg-danger ms-2">
+                                @Model.MeusAtrasados atrasado(s)
+                            </span>
+                        }
+                    </p>
+
+                    <a asp-controller="Conta"
+                       asp-action="MeusEmprestimos"
+                       class="btn btn-outline-primary btn-sm">
+
+                        Ver meus empréstimos
+                        <i class="bi bi-arrow-right ms-1"></i>
+
+                    </a>
+
+                </div>
+
+            </div>
+
+            <div class="hero-usuario-card">
+
+                <div class="hero-usuario-card-icon">
+                    <i class="bi bi-person"></i>
+                </div>
+
+                <div class="hero-usuario-card-content">
+
+                    <h5>
+                        Meu perfil
+                    </h5>
+
+                    <p>
+                        Atualize seus dados, senha e preferências
+                        da sua conta.
+                    </p>
+
+                    <a asp-controller="Conta"
+                       asp-action="Perfil"
+                       class="btn btn-outline-primary btn-sm">
+
+                        Abrir perfil
+                        <i class="bi bi-arrow-right ms-1"></i>
+
+                    </a>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </section>
+
+    @if (Model.LivrosDestaque.Any())
+    {
+        <section class="mb-5">
+
+            <div class="section-title mb-4">
+                <br /><h2>Destaques da biblioteca</h2>
+                <p>Confira alguns livros selecionados especialmente para você.</p>
+            </div>
+
+            <div class="row row-cols-2 row-cols-md-4 g-4 destaques-livros">
+
+                @foreach (var livro in Model.LivrosDestaque)
+                {
+                    <div class="col">
+
+                        <div class="card livro-card h-100">
+
+                            <a asp-controller="Livros"
+                               asp-action="Details"
+                               asp-route-id="@livro.Id"
+                               class="livro-capa"
+                               aria-label="Ver @livro.Titulo"
+                               style="@(string.IsNullOrWhiteSpace(livro.Capa)
+                                    ? ""
+                                    : $"background-image: url('{livro.Capa}');")">
+                            </a>
+
+                            <div class="card-body d-flex flex-column">
+
+                                <h5 class="livro-titulo">
+                                    @livro.Titulo
+                                </h5>
+
+                                <p class="livro-meta mb-1">
+                                    <i class="bi bi-person me-1"></i>
+                                    @livro.Autores
+                                </p>
+
+                                <p class="livro-meta mb-3">
+                                    <i class="bi bi-tag me-1"></i>
+                                    @livro.Categoria
+                                </p>
+
+                                @if (livro.ExemplaresDisponiveis > 0)
+                                {
+                                    <span class="badge text-bg-success align-self-start mb-3">
+                                        <i class="bi bi-check-circle me-1"></i>
+                                        Disponível
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span class="badge text-bg-secondary align-self-start mb-3">
+                                        Indisponível
+                                    </span>
+                                }
+
+                                <a asp-controller="Livros"
+                                   asp-action="Details"
+                                   asp-route-id="@livro.Id"
+                                   class="btn btn-sm btn-outline-primary mt-auto">
+
+                                    <i class="bi bi-eye me-1"></i>
+                                    Ver livro
+
+                                </a>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+                }
+
+            </div>
+
+        </section>
+    }
+
+    @if (Model.CategoriasPrincipais.Any())
+{
+    <section class="mb-5 categorias-principais">
+
+        <div class="section-title mb-4">
+            <h2>Principais Categorias</h2>
+            <p>Explore o acervo por assunto e encontre sua próxima leitura.</p>
+        </div>
+
+        <div class="row row-cols-2 row-cols-md-3 row-cols-lg-6 g-4">
+
+            @foreach (var categoria in Model.CategoriasPrincipais)
+            {
+                <div class="col">
+
+                    <a asp-controller="Livros"
+                       asp-action="Index"
+                       asp-route-categoriaId="@categoria.Id"
+                       class="card categoria-card h-100 text-decoration-none">
+
+                        @if (!string.IsNullOrWhiteSpace(categoria.Imagem))
+                        {
+                            <img src="@categoria.Imagem"
+                                 class="card-img-top categoria-card-imagem"
+                                 alt="@categoria.Nome"
+                                 loading="lazy" />
+                        }
+                        else
+                        {
+                            <div class="categoria-card-sem-imagem">
+                                <i class="bi bi-book"></i>
+                            </div>
+                        }
+
+                        <div class="card-body text-center">
+                            <h3 class="categoria-card-titulo mb-0">
+                                @categoria.Nome
+                            </h3>
+                        </div>
+
+                    </a>
+
+                </div>
+            }
+
+        </div>
+
+    </section>
+}
+
+}
+
+else
+{
+    @* ===== Visitante: hero com parallax (imagem: --img-hero em site.css) ===== *@
+    <section class="hero">
+        <div class="hero-conteudo">
+            <h1>Seu próximo livro está aqui</h1>
+            <p class="lead mb-4">Pesquise o acervo, veja a disponibilidade em tempo real e pegue livros emprestados.</p>
+            <a asp-controller="Livros" asp-action="Index" class="btn btn-primary btn-lg me-2">Ver catálogo</a>
+            <a asp-controller="Conta" asp-action="Login" class="btn btn-outline-light btn-lg">Entrar</a>
+        </div>
+    </section>
+
+    <div class="section-title">
+        <h2>Como funciona</h2>
+        <p>Três passos simples para ler mais.</p>
+    </div>
+
+    @* Cada .img-slot usa uma imagem definida em site.css (--img-destaque-1/2/3) *@
+    <div class="row g-4">
+        <div class="col-md-4"><div class="card feature-card">
+            <div class="img-slot img-destaque-1"></div>
+            <div class="card-body"><h5>Busque no acervo</h5><p class="text-body-secondary mb-0">Procure por título, autor, editora ou categoria.</p></div>
+        </div></div>
+        <div class="col-md-4"><div class="card feature-card">
+            <div class="img-slot img-destaque-2"></div>
+            <div class="card-body"><h5>Pegue emprestado</h5><p class="text-body-secondary mb-0">Crie sua conta e reserve o exemplar em um clique.</p></div>
+        </div></div>
+        <div class="col-md-4"><div class="card feature-card">
+            <div class="img-slot img-destaque-3"></div>
+            <div class="card-body"><h5>Acompanhe os prazos</h5><p class="text-body-secondary mb-0">Veja o que está com você e quando devolver.</p></div>
+        </div></div>
+    </div>
+
+    @* Faixa de chamada com parallax (imagem: --img-cta) *@
+    <section class="cta-band">
+        <h2 class="mb-2">Pronto para começar?</h2>
+        <p class="mb-4">Crie sua conta gratuita e comece a pegar livros emprestados.</p>
+        <a asp-controller="Conta" asp-action="Registrar" class="btn btn-primary btn-lg">Criar conta</a>
+    </section>
+}
+
